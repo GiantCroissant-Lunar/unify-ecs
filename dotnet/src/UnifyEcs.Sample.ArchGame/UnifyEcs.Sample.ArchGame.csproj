@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <CompilerGeneratedFilesOutputPath>$(BaseIntermediateOutputPath)Generated</CompilerGeneratedFilesOutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Explicitly target the Arch backend and emulate Reactive features for tests/samples -->
+    <UnifyEcsBackends>Arch</UnifyEcsBackends>
+    <UnifyEcsPolicy_Reactive>Emulate</UnifyEcsPolicy_Reactive>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\UnifyEcs.Core\UnifyEcs.Core.csproj" />
+    <ProjectReference Include="..\UnifyEcs.Attributes\UnifyEcs.Attributes.csproj" />
+    <ProjectReference Include="..\UnifyEcs.Runtime.Arch\UnifyEcs.Runtime.Arch.csproj" />
+    <!-- Ensure the source generator project is built before this project,
+         without referencing its assembly as a normal library. -->
+    <ProjectReference Include="..\UnifyEcs.Generators\UnifyEcs.Generators.csproj"
+                      Private="true"
+                      ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Use the built UnifyEcs.Generators assembly as a source generator/analyzer.
+         Referencing the DLL from its bin folder ensures its dependencies
+         (like UnifyEcs.Core) are loadable at generator runtime. -->
+    <Analyzer Include="..\UnifyEcs.Generators\bin\$(Configuration)\netstandard2.1\UnifyEcs.Generators.dll" />
+    <!-- Also include the generator's runtime dependencies so the analyzer
+         load context can resolve them when the generator runs. -->
+    <Analyzer Include="..\UnifyEcs.Generators\bin\$(Configuration)\netstandard2.1\UnifyEcs.Core.dll" />
+    <Analyzer Include="..\UnifyEcs.Generators\bin\$(Configuration)\netstandard2.1\UnifyEcs.Attributes.dll" />
+  </ItemGroup>
+</Project>
