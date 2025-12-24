@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "./build.config.schema.json",
+  "title": "UnifyBuild build.config",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": ["string", "null"] },
+    "version": { "type": ["string", "null"] },
+    "versionEnv": { "type": ["string", "null"], "default": "Version" },
+    "artifactsVersion": { "type": ["string", "null"] },
+    "solution": { "type": ["string", "null"] },
+
+    "projectGroups": {
+      "type": ["object", "null"],
+      "additionalProperties": { "$ref": "#/$defs/projectGroup" }
+    },
+
+    "compileProjects": {
+      "type": ["array", "null"],
+      "items": { "type": "string" }
+    },
+    "publishProjects": {
+      "type": ["array", "null"],
+      "items": { "type": "string" }
+    },
+    "packProjects": {
+      "type": ["array", "null"],
+      "items": { "type": "string" }
+    },
+
+    "nuGetOutputDir": { "type": ["string", "null"] },
+    "publishOutputDir": { "type": ["string", "null"] },
+
+    "packProperties": {
+      "type": ["object", "null"],
+      "additionalProperties": { "type": "string" }
+    },
+
+    "syncLocalNugetFeed": { "type": "boolean", "default": false },
+    "localNugetFeedRoot": { "type": ["string", "null"] },
+    "localNugetFeedFlatSubdir": { "type": ["string", "null"], "default": "flat" },
+    "localNugetFeedHierarchicalSubdir": { "type": ["string", "null"], "default": "hierarchical" },
+    "localNugetFeedBaseUrl": { "type": ["string", "null"] }
+  },
+  "$defs": {
+    "projectGroup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sourceDir"],
+      "properties": {
+        "sourceDir": { "type": "string" },
+        "action": {
+          "type": "string",
+          "default": "compile",
+          "enum": ["publish", "pack", "compile"]
+        },
+        "include": {
+          "type": ["array", "null"],
+          "items": { "type": "string" }
+        },
+        "exclude": {
+          "type": ["array", "null"],
+          "items": { "type": "string" }
+        },
+        "outputDir": { "type": ["string", "null"] },
+        "properties": {
+          "type": ["object", "null"],
+          "additionalProperties": { "type": "string" }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "$schema": "./build.config.schema.json",
+  "solution": null,
+  "versionEnv": "Version",
+  "artifactsVersion": "unify-ecs",
+
+  "projectGroups": {
+    "libraries": {
+      "sourceDir": "dotnet/src",
+      "action": "compile",
+      "include": [],
+      "exclude": []
+    }
+  }
+}

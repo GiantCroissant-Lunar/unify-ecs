@@ -1,0 +1,24 @@
+<Project>
+  <ItemGroup>
+    <CompilerVisibleProperty Include="UnifyEcsEmitDebugInfo" />
+    <CompilerVisibleProperty Include="UnifyEcsBackends" />
+    <CompilerVisibleProperty Include="UnifyEcsMissingFeaturePolicy" />
+    <CompilerVisibleProperty Include="UnifyEcsPolicy_EntityLifecycle" />
+    <CompilerVisibleProperty Include="UnifyEcsPolicy_ComponentOperations" />
+    <CompilerVisibleProperty Include="UnifyEcsPolicy_BasicQueries" />
+    <CompilerVisibleProperty Include="UnifyEcsPolicy_SystemExecution" />
+    <CompilerVisibleProperty Include="UnifyEcsPolicy_Basic" />
+    <CompilerVisibleProperty Include="UnifyEcsPolicy_Events" />
+    <CompilerVisibleProperty Include="UnifyEcsPolicy_AdvancedFiltering" />
+    <CompilerVisibleProperty Include="UnifyEcsPolicy_TagComponents" />
+    <CompilerVisibleProperty Include="UnifyEcsPolicy_SystemGroups" />
+    <CompilerVisibleProperty Include="UnifyEcsPolicy_Reactive" />
+    <CompilerVisibleProperty Include="UnifyEcsPolicy_Relationships" />
+    <CompilerVisibleProperty Include="UnifyEcsPolicy_Jobs" />
+    <CompilerVisibleProperty Include="UnifyEcsPolicy_WorldEvents" />
+    <CompilerVisibleProperty Include="UnifyEcsPolicy_BurstCompile" />
+    <CompilerVisibleProperty Include="UnifyEcsPolicy_SharedComponents" />
+    <CompilerVisibleProperty Include="UnifyEcsPolicy_ChunkIteration" />
+    <CompilerVisibleProperty Include="UnifyEcsPolicy_ComponentPools" />
+  </ItemGroup>
+</Project>
