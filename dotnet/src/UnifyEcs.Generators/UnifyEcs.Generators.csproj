@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <!-- This project is an analyzer / source generator -->
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\UnifyEcs.Core\UnifyEcs.Core.csproj" />
+    <ProjectReference Include="..\UnifyEcs.Attributes\UnifyEcs.Attributes.csproj" />
+  </ItemGroup>
+
+  <!-- Expose optional property to toggle extra debug output if desired -->
+  <ItemGroup>
+    <CompilerVisibleProperty Include="UnifyEcsEmitDebugInfo" />
+    <CompilerVisibleProperty Include="UnifyEcsBackends" />
+    <CompilerVisibleProperty Include="UnifyEcsMissingFeaturePolicy" />
+  </ItemGroup>
+</Project>

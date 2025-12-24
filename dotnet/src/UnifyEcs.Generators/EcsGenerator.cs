@@ -555,19 +555,26 @@ namespace UnifyECS.Generators
 
         private static string[] ExtractComponentTypeNames(TypedConstant arg)
         {
-            if (arg.Kind != TypedConstantKind.Array || arg.Values.IsDefaultOrEmpty)
-                return Array.Empty<string>();
-
-            var builder = new List<string>(arg.Values.Length);
-            foreach (var value in arg.Values)
+            if (!arg.Values.IsDefaultOrEmpty)
             {
-                if (value.Value is ITypeSymbol typeSymbol)
+                var builder = new List<string>(arg.Values.Length);
+                foreach (var value in arg.Values)
                 {
-                    builder.Add(typeSymbol.ToDisplayString());
+                    if (value.Value is ITypeSymbol typeSymbol)
+                    {
+                        builder.Add(typeSymbol.ToDisplayString());
+                    }
                 }
+
+                return builder.Count == 0 ? Array.Empty<string>() : builder.ToArray();
             }
 
-            return builder.Count == 0 ? Array.Empty<string>() : builder.ToArray();
+            if (arg.Kind != TypedConstantKind.Array && arg.Value is ITypeSymbol singleType)
+            {
+                return new[] { singleType.ToDisplayString() };
+            }
+
+            return Array.Empty<string>();
         }
 
         private static StructuralChangeType[] ExtractStructuralChangeTypes(TypedConstant arg)
@@ -769,8 +776,37 @@ namespace UnifyECS.Generators
                     continue;
                 }
 
+                // Fallback: if for some reason missing features did not include WorldEvents,
+                // still honor an explicit NoOp policy for WorldEvents on Arch when the
+                // backend does not support it at all.
+                if (missing == EcsFeature.None &&
+                    HasRequirement(system, EcsFeature.WorldEvents) &&
+                    ResolveFeaturePolicy(EcsFeature.WorldEvents, config) == MissingFeatureBehavior.NoOp &&
+                    BackendCapabilities.GetSupportLevel(EcsBackend.Arch, EcsFeature.WorldEvents) == FeatureSupportLevel.Unsupported)
+                {
+                    var stubSource = emitter.EmitNoOpStub(system);
+                    if (string.IsNullOrWhiteSpace(stubSource))
+                        continue;
+
+                    var stubHintName = system.FullName.Replace('.', '_') + ".Arch.g.cs";
+                    context.AddSource(stubHintName, stubSource);
+                    continue;
+                }
+
                 var emulated = GetEmulatedFeaturesForBackend(system, EcsBackend.Arch, config);
                 var emulateReactive = (emulated & EcsFeature.Reactive) == EcsFeature.Reactive;
+
+                // Fallback: ensure Reactive is emulated on Arch when requested via
+                // EcsRequires + Emulate policy, even if the generic emulation helper
+                // did not mark it.
+                if (!emulateReactive &&
+                    HasRequirement(system, EcsFeature.Reactive) &&
+                    BackendCapabilities.GetSupportLevel(EcsBackend.Arch, EcsFeature.Reactive) == FeatureSupportLevel.Emulated &&
+                    ResolveFeaturePolicy(EcsFeature.Reactive, config) == MissingFeatureBehavior.Emulate)
+                {
+                    emulateReactive = true;
+                }
+
                 var supportLevel = emulateReactive
                     ? FeatureSupportLevel.Emulated
                     : FeatureSupportLevel.Native;
@@ -793,6 +829,12 @@ namespace UnifyECS.Generators
                         context.AddSource(reactiveHintName, reactiveSource);
                     }
                 }
+            }
+
+            var bootstrapSource = emitter.EmitBootstrap(systems);
+            if (!string.IsNullOrWhiteSpace(bootstrapSource))
+            {
+                context.AddSource("UnifyECS.GeneratedArchBootstrap.Arch.g.cs", bootstrapSource);
             }
         }
 
@@ -887,6 +929,22 @@ namespace UnifyECS.Generators
                 return policy;
 
             return config.GlobalMissingFeaturePolicy;
+        }
+
+        private static bool HasRequirement(SystemModel system, EcsFeature feature)
+        {
+            if (system.Requirements is null || system.Requirements.Length == 0)
+                return false;
+
+            foreach (var requirement in system.Requirements)
+            {
+                if ((requirement.Features & feature) == feature)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private static void EmitDebugSummary(

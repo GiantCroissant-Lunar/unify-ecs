@@ -16,5 +16,6 @@
     <ProjectReference Include="..\..\src\UnifyEcs.Generators\UnifyEcs.Generators.csproj" />
     <ProjectReference Include="..\..\src\UnifyEcs.Core\UnifyEcs.Core.csproj" />
     <ProjectReference Include="..\..\src\UnifyEcs.Attributes\UnifyEcs.Attributes.csproj" />
+    <ProjectReference Include="..\..\src\UnifyEcs.Runtime.Arch\UnifyEcs.Runtime.Arch.csproj" />
   </ItemGroup>
 </Project>
