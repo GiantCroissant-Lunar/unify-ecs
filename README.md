@@ -1,5 +1,8 @@
 # UnifyECS
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![.NET](https://img.shields.io/badge/.NET-8.0%20%7C%209.0-blue.svg)](https://dotnet.microsoft.com/download)
+
 A source-generation-based abstraction layer that enables writing ECS game code once and running it on multiple ECS implementations.
 
 ## Vision
@@ -38,6 +41,27 @@ The same code compiles to optimized implementations for:
 - **Explicit Capability Management**: Declare what features you need
 - **Policy-Driven Compatibility**: Configure how to handle unsupported features
 - **Multi-Backend Support**: Migration, benchmarking, cross-platform
+
+## Project Structure
+
+```
+unify-ecs/
+├── dotnet/
+│   ├── src/
+│   │   ├── UnifyEcs.Core/         # Core types, interfaces, attributes
+│   │   ├── UnifyEcs.Generators/   # Source generator pipeline
+│   │   ├── UnifyEcs.Analyzers/    # Roslyn analyzers
+│   │   ├── UnifyEcs.Attributes/   # Public attribute API
+│   │   ├── UnifyEcs.Runtime.*/    # Backend-specific runtimes
+│   │   └── UnifyEcs.Sample.*/     # Sample games
+│   └── UnifyGrid.sln              # Main solution file
+├── docs/
+│   ├── rfcs/                      # Design documents
+│   ├── specs/                     # Feature specifications
+│   ├── handovers/                 # Session handovers
+│   └── reviews/                   # Code reviews
+└── build/                         # Build scripts
+```
 
 ## Documentation
 
@@ -83,10 +107,41 @@ See [docs/IMPLEMENTATION-PLAN.md](./docs/IMPLEMENTATION-PLAN.md) for the full im
 4. RFC-0006 (Policies) → RFC-0005/Entitas → RFC-0007 (Orchestration)
 5. RFC-0010 (DOTS) → RFC-0005/DOTS
 
+## Supported Backends
+
+| Backend | Status | Version |
+|---------|--------|---------|
+| Arch | ✅ Implemented | 2.1.0 |
+| Flecs | ✅ Implemented | 4.0.4 |
+| Friflo | ✅ Implemented | 1.3.2 |
+| Entitas | 🚧 Planned | - |
+| Unity DOTS | 🚧 Planned | - |
+
+## Building
+
+```bash
+cd dotnet
+dotnet build UnifyGrid.sln
+dotnet test UnifyGrid.sln
+```
+
+## Requirements
+
+- .NET 8.0 or later (.NET 9.0 for Flecs backend)
+- C# 11 or later
+
 ## Status
 
-🚧 **Design Phase** - RFCs approved for prototype implementation.
+🚧 **Early Development** - Core architecture and initial backend implementations in progress.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to contribute to this project.
 
 ## License
 
-TBD
+MIT License - see [LICENSE](LICENSE) for details.
+
+## Third-Party Notices
+
+See [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) for licenses of backend dependencies and referenced works.
