@@ -2,6 +2,7 @@
   <ItemGroup>
     <CompilerVisibleProperty Include="UnifyEcsEmitDebugInfo" />
     <CompilerVisibleProperty Include="UnifyEcsBackends" />
+    <CompilerVisibleProperty Include="UnifyEcsFlecsNative" />
     <CompilerVisibleProperty Include="UnifyEcsMissingFeaturePolicy" />
     <CompilerVisibleProperty Include="UnifyEcsPolicy_EntityLifecycle" />
     <CompilerVisibleProperty Include="UnifyEcsPolicy_ComponentOperations" />

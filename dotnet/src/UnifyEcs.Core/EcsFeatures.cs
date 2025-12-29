@@ -9,6 +9,7 @@ namespace UnifyECS
     {
         Arch,
         Entitas,
+        Flecs,
         Dots,
         DefaultEcs,
         Friflo,
@@ -90,6 +91,17 @@ namespace UnifyECS
                 EcsFeature.Reactive |
                 EcsFeature.SystemGroups,
 
+            EcsBackend.Flecs =>
+                EcsFeature.Basic |
+                EcsFeature.AdvancedFiltering |
+                EcsFeature.TagComponents |
+                EcsFeature.Events |
+                EcsFeature.Reactive |
+                EcsFeature.Relationships |
+                EcsFeature.Jobs |
+                EcsFeature.WorldEvents |
+                EcsFeature.SystemGroups,
+
             EcsBackend.Dots =>
                 EcsFeature.Basic |
                 EcsFeature.AdvancedFiltering |
@@ -128,6 +140,12 @@ namespace UnifyECS
 
             EcsBackend.Entitas =>
                 EcsFeature.WorldEvents,
+
+            EcsBackend.Flecs =>
+                EcsFeature.None,
+
+            EcsBackend.Friflo =>
+                EcsFeature.Reactive,
 
             EcsBackend.Dots =>
                 EcsFeature.Events |

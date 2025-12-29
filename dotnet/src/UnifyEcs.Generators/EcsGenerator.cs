@@ -28,6 +28,8 @@ namespace UnifyECS.Generators
         {
             public bool EmitArch => Array.IndexOf(Backends, EcsBackend.Arch) >= 0;
             public bool EmitEntitas => Array.IndexOf(Backends, EcsBackend.Entitas) >= 0;
+            public bool EmitFlecs => Array.IndexOf(Backends, EcsBackend.Flecs) >= 0;
+            public bool EmitFriflo => Array.IndexOf(Backends, EcsBackend.Friflo) >= 0;
         }
 
         private const string ComponentAttributeMetadataName          = "UnifyECS.EcsComponentAttribute";
@@ -80,10 +82,22 @@ namespace UnifyECS.Generators
                 // Debug summary for development
                 EmitDebugSummary(spc, components, systems);
 
-                // Arch backend emission (Phase 1 skeleton)
+                // Arch backend emission
                 if (config.EmitArch)
                 {
                     EmitArchBackend(spc, components, systems, config);
+                }
+
+                // Flecs backend emission
+                if (config.EmitFlecs)
+                {
+                    EmitFlecsBackend(spc, components, systems, config);
+                }
+
+                // Friflo backend emission
+                if (config.EmitFriflo)
+                {
+                    EmitFrifloBackend(spc, components, systems, config);
                 }
 
                 // Entitas / other backends will be added in later phases when emitters are ready.
@@ -945,6 +959,112 @@ namespace UnifyECS.Generators
             }
 
             return false;
+        }
+
+        private static void EmitFlecsBackend(
+            SourceProductionContext context,
+            IReadOnlyList<ComponentModel> components,
+            IReadOnlyList<SystemModel> systems,
+            GeneratorConfig config)
+        {
+            var emitter = new FlecsBackendEmitter();
+
+            foreach (var system in systems)
+            {
+                var missing = GetMissingFeaturesForBackend(system, EcsBackend.Flecs);
+
+                // If there are unsupported features and effective policy for any of them
+                // is NoOp, skip emitting this system (Flecs doesn't support those features).
+                if (missing != EcsFeature.None && ShouldEmitNoOpStub(missing, config))
+                {
+                    continue;
+                }
+
+                var emulated = GetEmulatedFeaturesForBackend(system, EcsBackend.Flecs, config);
+                var emulateReactive = (emulated & EcsFeature.Reactive) == EcsFeature.Reactive;
+
+                var supportLevel = emulateReactive
+                    ? FeatureSupportLevel.Emulated
+                    : FeatureSupportLevel.Native;
+
+                var source = emitter.EmitSystem(system, supportLevel);
+                if (string.IsNullOrWhiteSpace(source))
+                    continue;
+
+                var hintName = system.FullName.Replace('.', '_') + ".Flecs.g.cs";
+                context.AddSource(hintName, source);
+
+                // If this system requests reactive features and the policy is set to Emulate
+                // for Flecs, emit a separate partial that provides reactive emulation helpers.
+                if (emulateReactive && system.ReactiveHandlers is { Length: > 0 })
+                {
+                    var reactiveSource = emitter.EmitReactiveEmulation(system);
+                    if (!string.IsNullOrWhiteSpace(reactiveSource))
+                    {
+                        var reactiveHintName = system.FullName.Replace('.', '_') + ".Flecs.Reactive.g.cs";
+                        context.AddSource(reactiveHintName, reactiveSource);
+                    }
+                }
+            }
+
+            var bootstrapSource = emitter.EmitBootstrap(systems);
+            if (!string.IsNullOrWhiteSpace(bootstrapSource))
+            {
+                context.AddSource("UnifyECS.GeneratedFlecsBootstrap.Flecs.g.cs", bootstrapSource);
+            }
+        }
+
+        private static void EmitFrifloBackend(
+            SourceProductionContext context,
+            IReadOnlyList<ComponentModel> components,
+            IReadOnlyList<SystemModel> systems,
+            GeneratorConfig config)
+        {
+            var emitter = new FrifloBackendEmitter();
+
+            foreach (var system in systems)
+            {
+                var missing = GetMissingFeaturesForBackend(system, EcsBackend.Friflo);
+
+                // If there are unsupported features and effective policy for any of them
+                // is NoOp, skip emitting this system (Friflo doesn't support those features).
+                if (missing != EcsFeature.None && ShouldEmitNoOpStub(missing, config))
+                {
+                    continue;
+                }
+
+                var emulated = GetEmulatedFeaturesForBackend(system, EcsBackend.Friflo, config);
+                var emulateReactive = (emulated & EcsFeature.Reactive) == EcsFeature.Reactive;
+
+                var supportLevel = emulateReactive
+                    ? FeatureSupportLevel.Emulated
+                    : FeatureSupportLevel.Native;
+
+                var source = emitter.EmitSystem(system, supportLevel);
+                if (string.IsNullOrWhiteSpace(source))
+                    continue;
+
+                var hintName = system.FullName.Replace('.', '_') + ".Friflo.g.cs";
+                context.AddSource(hintName, source);
+
+                // If this system requests reactive features and the policy is set to Emulate
+                // for Friflo, emit a separate partial that provides reactive emulation helpers.
+                if (emulateReactive && system.ReactiveHandlers is { Length: > 0 })
+                {
+                    var reactiveSource = emitter.EmitReactiveEmulation(system);
+                    if (!string.IsNullOrWhiteSpace(reactiveSource))
+                    {
+                        var reactiveHintName = system.FullName.Replace('.', '_') + ".Friflo.Reactive.g.cs";
+                        context.AddSource(reactiveHintName, reactiveSource);
+                    }
+                }
+            }
+
+            var bootstrapSource = emitter.EmitBootstrap(systems);
+            if (!string.IsNullOrWhiteSpace(bootstrapSource))
+            {
+                context.AddSource("UnifyECS.GeneratedFrifloBootstrap.Friflo.g.cs", bootstrapSource);
+            }
         }
 
         private static void EmitDebugSummary(
