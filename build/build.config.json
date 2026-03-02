@@ -1,15 +1,35 @@
 {
   "$schema": "./build.config.schema.json",
-  "solution": null,
-  "versionEnv": "Version",
-  "artifactsVersion": "unify-ecs",
-
+  "versionEnv": "GITVERSION_MAJORMINORPATCH",
+  "artifactsVersion": "0.1.0",
+  "solution": "dotnet/UnifyEcs.sln",
   "projectGroups": {
-    "libraries": {
+    "packages": {
       "sourceDir": "dotnet/src",
-      "action": "compile",
-      "include": [],
-      "exclude": []
+      "action": "pack",
+      "include": [
+        "UnifyEcs.Core",
+        "UnifyEcs.Attributes",
+        "UnifyEcs.Generators",
+        "UnifyEcs.Analyzers",
+        "UnifyEcs.Runtime.Arch",
+        "UnifyEcs.Runtime.Flecs",
+        "UnifyEcs.Runtime.Friflo",
+        "UnifyEcs.Sample.ArchGame",
+        "UnifyEcs.Sample.FlecsGame",
+        "UnifyEcs.Sample.FrifloGame"
+      ],
+      "exclude": [
+        "UnifyEcs.Runtime.Flecs",
+        "UnifyEcs.Runtime.Friflo",
+        "UnifyEcs.Sample.FlecsGame",
+        "UnifyEcs.Sample.FrifloGame"
+      ]
     }
-  }
+  },
+  "packIncludeSymbols": false,
+  "packProperties": {
+    "GeneratePackageOnBuild": "false"
+  },
+  "syncLocalNugetFeed": false
 }

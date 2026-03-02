@@ -37,6 +37,8 @@
       "additionalProperties": { "type": "string" }
     },
 
+    "packIncludeSymbols": { "type": "boolean", "default": false },
+
     "syncLocalNugetFeed": { "type": "boolean", "default": false },
     "localNugetFeedRoot": { "type": ["string", "null"] },
     "localNugetFeedFlatSubdir": { "type": ["string", "null"], "default": "flat" },
