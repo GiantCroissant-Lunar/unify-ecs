@@ -183,16 +183,81 @@ namespace UnifyECS.Generators.Backends
             sb.Append(indent).Append("        ").AppendLine(queryBuilder.ToString());
             sb.AppendLine();
 
-            // Execute query
-            sb.Append(indent).AppendLine("        foreach (ref var entity in query)");
+            // Generate component array variable names for chunk-based iteration
+            var componentArrayNames = BuildComponentArrayNames(query);
+
+            // Execute query using chunk-based iteration (Friflo 1.4.0+)
+            // Build the tuple deconstruction pattern: (comp1, comp2, ..., entities)
+            sb.Append(indent).Append("        foreach (var (");
+            if (componentArrayNames.Count > 0)
+            {
+                sb.Append(string.Join(", ", componentArrayNames));
+                sb.Append(", ");
+            }
+            sb.AppendLine("entities) in query.Chunks)");
             sb.Append(indent).AppendLine("        {");
+            sb.Append(indent).AppendLine("            for (int i = 0; i < entities.Length; i++)");
+            sb.Append(indent).AppendLine("            {");
 
             // Call user's query method with the appropriate parameters
-            var callArgs = BuildCallArguments(query);
-            sb.Append(indent).Append($"            {query.MethodName}({callArgs});").AppendLine();
+            var callArgs = BuildCallArguments(query, componentArrayNames);
+            sb.Append(indent).Append($"                {query.MethodName}({callArgs});").AppendLine();
 
+            sb.Append(indent).AppendLine("            }");
             sb.Append(indent).AppendLine("        }");
             sb.Append(indent).AppendLine("    }");
+        }
+
+        /// <summary>
+        /// Builds unique variable names for each component array in chunk iteration.
+        /// </summary>
+        private List<string> BuildComponentArrayNames(QueryModel query)
+        {
+            var names = new List<string>();
+            var seenTypes = new HashSet<string>();
+
+            for (int i = 0; i < query.ParameterTypeNames.Length; i++)
+            {
+                var type = query.ParameterTypeNames[i];
+
+                // Skip entity parameters - they're not part of the component arrays
+                if (IsEntityParameter(type))
+                    continue;
+
+                // Generate a camelCase variable name from the type name
+                // e.g., "PositionComponent" -> "positionComponent"
+                var baseName = MakeSafeIdentifier(type);
+                if (baseName.EndsWith("Component"))
+                    baseName = baseName.Substring(0, baseName.Length - 9);
+                if (baseName.EndsWith("Comp"))
+                    baseName = baseName.Substring(0, baseName.Length - 4);
+
+                // Ensure uniqueness
+                string varName = ToCamelCase(baseName);
+                string uniqueName = varName;
+                int counter = 2;
+                while (!seenTypes.Add(uniqueName))
+                {
+                    uniqueName = varName + counter;
+                    counter++;
+                }
+
+                names.Add(uniqueName);
+            }
+
+            return names;
+        }
+
+        /// <summary>
+        /// Converts a PascalCase identifier to camelCase.
+        /// </summary>
+        private string ToCamelCase(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return input;
+            if (char.IsLower(input[0]))
+                return input;
+            return char.ToLowerInvariant(input[0]) + input.Substring(1);
         }
 
         /// <summary>
@@ -233,10 +298,11 @@ namespace UnifyECS.Generators.Backends
         /// <summary>
         /// Builds argument list for calling the user's query method.
         /// </summary>
-        private string BuildCallArguments(QueryModel query)
+        private string BuildCallArguments(QueryModel query, List<string>? componentArrayNames = null)
         {
             var builder = new StringBuilder();
             var argIndex = 0;
+            var componentArrayIndex = 0;
 
             for (int i = 0; i < query.ParameterTypeNames.Length; i++)
             {
@@ -246,51 +312,47 @@ namespace UnifyECS.Generators.Backends
 
                 if (IsEntityParameter(type))
                 {
-                    // Entity parameter from the foreach loop
+                    // Entity parameter from the inner for loop
                     if (argIndex > 0)
                     {
                         builder.Append(", ");
                     }
 
-                    // Convert Friflo entity to UnifyECS entity
-                    if (refKind == RefKind.Ref || refKind == RefKind.Out || refKind == RefKind.In)
-                    {
-                        // Can't ref entity in foreach, so pass it directly
-                        builder.Append($"FrifloWorld.MapEntity(entity)");
-                    }
-                    else
-                    {
-                        builder.Append($"FrifloWorld.MapEntity(entity)");
-                    }
+                    // Convert Friflo entity to UnifyECS entity using entities[i]
+                    builder.Append($"FrifloWorld.MapEntity(entities[i])");
 
                     argIndex++;
                 }
                 else
                 {
-                    // Component parameters - get them from the entity
+                    // Component parameters - get them from the component arrays
                     if (argIndex > 0)
                     {
                         builder.Append(", ");
                     }
 
+                    // Get the component array variable name
+                    string compVarName = componentArrayNames?[componentArrayIndex] ?? $"comp{componentArrayIndex}";
+
                     if (refKind == RefKind.Ref)
                     {
-                        builder.Append($"ref entity.GetComponent<{type}>()");
+                        builder.Append($"ref {compVarName}[i]");
                     }
                     else if (refKind == RefKind.In)
                     {
-                        builder.Append($"in entity.GetComponent<{type}>()");
+                        builder.Append($"in {compVarName}[i]");
                     }
                     else if (refKind == RefKind.Out)
                     {
-                        builder.Append($"out var component_{argIndex}");
+                        builder.Append($"out {compVarName}[i]");
                     }
                     else
                     {
-                        builder.Append($"entity.GetComponent<{type}>()");
+                        builder.Append($"{compVarName}[i]");
                     }
 
                     argIndex++;
+                    componentArrayIndex++;
                 }
             }
 
@@ -302,7 +364,7 @@ namespace UnifyECS.Generators.Backends
         /// </summary>
         private bool IsEntityParameter(string typeName)
         {
-            return typeName == "UnifyECS.Entity" || 
+            return typeName == "UnifyECS.Entity" ||
                    typeName == "Entity" ||
                    typeName == "global::UnifyECS.Entity";
         }
@@ -379,10 +441,12 @@ namespace UnifyECS.Generators.Backends
 
                 sb.Append(indent).AppendLine("        // Build current snapshot and fire OnAdded/OnChanged");
                 sb.Append(indent).AppendLine("        var query = entities.Query().WithAll<" + componentTypeName + ">();");
-                sb.Append(indent).AppendLine("        foreach (ref var entity in query)");
+                sb.Append(indent).AppendLine("        foreach (var (componentSpan, entitySpan) in query.Chunks)");
                 sb.Append(indent).AppendLine("        {");
-                sb.Append(indent).AppendLine("            var unifyEntity = FrifloWorld.MapEntity(entity);");
-                sb.Append(indent).AppendLine("            var component = entity.GetComponent<" + componentTypeName + ">();");
+                sb.Append(indent).AppendLine("            for (int i = 0; i < entitySpan.Length; i++)");
+                sb.Append(indent).AppendLine("            {");
+                sb.Append(indent).AppendLine("                var unifyEntity = FrifloWorld.MapEntity(entitySpan[i]);");
+                sb.Append(indent).AppendLine("                var component = componentSpan[i];");
                 sb.AppendLine();
 
                 sb.Append(indent).AppendLine("            if (__reactivePrev_" + safeName + ".TryGetValue(unifyEntity, out var prev))");
@@ -415,6 +479,7 @@ namespace UnifyECS.Generators.Backends
                 sb.AppendLine();
 
                 sb.Append(indent).AppendLine("            current[unifyEntity] = component;");
+                sb.Append(indent).AppendLine("            }");
                 sb.Append(indent).AppendLine("        }");
                 sb.AppendLine();
 
@@ -577,10 +642,10 @@ namespace UnifyECS.Generators.Backends
 
         private static string ToAccessibilityString(Accessibility accessibility) => accessibility switch
         {
-            Accessibility.Public    => "public",
-            Accessibility.Internal  => "internal",
+            Accessibility.Public => "public",
+            Accessibility.Internal => "internal",
             Accessibility.Protected => "protected",
-            Accessibility.Private   => "private",
+            Accessibility.Private => "private",
             Accessibility.ProtectedOrInternal => "protected internal",
             Accessibility.ProtectedAndInternal => "private protected",
             _ => "internal"

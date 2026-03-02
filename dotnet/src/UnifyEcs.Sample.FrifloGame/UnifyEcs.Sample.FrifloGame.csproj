@@ -6,6 +6,12 @@
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>true</IsPackable>
+    <PackageId>UnifyEcs.Sample.FrifloGame</PackageId>
+    <Version>$(GITVERSION_MAJORMINORPATCH)</Version>
+    <Authors>Lunar Horse</Authors>
+    <Description>Sample Friflo ECS game for the UnifyECS framework</Description>
+    <PackageTags>ecs;unify;lunar-horse;sample;friflo;game</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,7 +26,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Friflo.Engine.ECS" Version="1.3.2" />
+    <PackageReference Include="Friflo.Engine.ECS" Version="1.4.0" />
   </ItemGroup>
 
 </Project>
