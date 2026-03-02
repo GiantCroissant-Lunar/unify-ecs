@@ -200,10 +200,10 @@ namespace UnifyECS.Generators.Backends
             {
                 sb.Append(indent).AppendLine("    private sealed class WorldAdapter : global::UnifyECS.IWorld");
                 sb.Append(indent).AppendLine("    {");
-                sb.Append(indent).AppendLine("        private readonly World _world;");
+                sb.Append(indent).AppendLine("        private readonly global::Arch.Core.World _world;");
                 sb.Append(indent).AppendLine("        private readonly System.Collections.Generic.Dictionary<global::UnifyECS.Entity, Arch.Core.Entity> _entityMap = new System.Collections.Generic.Dictionary<global::UnifyECS.Entity, Arch.Core.Entity>();");
                 sb.AppendLine();
-                sb.Append(indent).AppendLine("        public WorldAdapter(World world)");
+                sb.Append(indent).AppendLine("        public WorldAdapter(global::Arch.Core.World world)");
                 sb.Append(indent).AppendLine("        {");
                 sb.Append(indent).AppendLine("            _world = world;");
                 sb.Append(indent).AppendLine("        }");
@@ -339,7 +339,7 @@ namespace UnifyECS.Generators.Backends
             }
 
             // Execute method
-            sb.Append(indent).AppendLine("    public void Execute(World world, float deltaTime)");
+            sb.Append(indent).AppendLine("    public void Execute(global::Arch.Core.World world, float deltaTime)");
             sb.Append(indent).AppendLine("    {");
 
             // Best-effort: if user has a DeltaTime injectable property, they
@@ -791,7 +791,7 @@ namespace UnifyECS.Generators.Backends
         private static string GetRefPrefix(RefKind refKind) => refKind switch
         {
             RefKind.Ref => "ref ",
-            RefKind.In  => "in ",
+            RefKind.In => "in ",
             RefKind.Out => "out ",
             _ => string.Empty
         };
@@ -874,10 +874,10 @@ namespace UnifyECS.Generators.Backends
 
         private static string ToAccessibilityString(Accessibility accessibility) => accessibility switch
         {
-            Accessibility.Public    => "public",
-            Accessibility.Internal  => "internal",
+            Accessibility.Public => "public",
+            Accessibility.Internal => "internal",
             Accessibility.Protected => "protected",
-            Accessibility.Private   => "private",
+            Accessibility.Private => "private",
             Accessibility.ProtectedOrInternal => "protected internal",
             Accessibility.ProtectedAndInternal => "private protected",
             _ => "internal"

@@ -80,36 +80,36 @@ namespace UnifyECS.Generators.Backends
             sb.Append(indent).AppendLine("    public void Execute(FlecsWorld worldWrapper, float deltaTime)");
             sb.Append(indent).AppendLine("    {");
             sb.Append(indent).AppendLine("        var world = worldWrapper.World;");
-            
+
             foreach (var query in system.Queries)
             {
                 sb.Append(indent).AppendLine($"        if (!_query_{query.MethodName}_initialized)");
                 sb.Append(indent).AppendLine("        {");
-                
+
                 // Build query
                 sb.Append(indent).Append($"            _query_{query.MethodName} = world.QueryBuilder()");
-                
+
                 // Add All (required) components
-                foreach(var type in query.AllComponents)
+                foreach (var type in query.AllComponents)
                 {
                     sb.Append($".With<{type}>()");
                 }
-                
+
                 // Add None (excluded) components
-                foreach(var type in query.NoneComponents)
+                foreach (var type in query.NoneComponents)
                 {
                     sb.Append($".Without<{type}>()");
                 }
-                
+
                 sb.AppendLine(".Build();");
                 sb.Append(indent).AppendLine($"            _query_{query.MethodName}_initialized = true;");
                 sb.Append(indent).AppendLine("        }");
                 sb.AppendLine();
-                
+
                 // Execute query
                 sb.Append(indent).AppendLine($"        _query_{query.MethodName}.Run((FlecsCore.Iter it) =>");
                 sb.Append(indent).AppendLine("        {");
-                
+
                 // Get column spans
                 // We need to map parameter index to field index.
                 // Flecs fields are 1-based index in the query terms.
@@ -118,45 +118,45 @@ namespace UnifyECS.Generators.Backends
                 // NoneComponents are not available as fields.
                 // So valid fields correspond to AllComponents.
                 // We need to match user method parameters to these fields.
-                
+
                 // Mapping strategy:
                 // 1. Collect all types used in AllComponents.
                 // 2. Map user parameters to these types to find their index.
-                
+
                 var allComponents = query.AllComponents;
                 var paramToFieldMap = new Dictionary<string, int>(); // ParamName -> FieldIndex (1-based)
-                
+
                 // The field index corresponds to the order in .With<T>().
-                
+
                 for (int i = 0; i < query.ParameterTypeNames.Length; i++)
                 {
                     var paramType = query.ParameterTypeNames[i];
                     var paramName = query.ParameterNames[i];
-                    
+
                     if (IsEntityParameter(paramType)) continue;
-                    
+
                     // Find index in AllComponents
                     int fieldIndex = -1;
-                    for(int j=0; j<allComponents.Length; j++)
+                    for (int j = 0; j < allComponents.Length; j++)
                     {
-                        if(allComponents[j] == paramType)
+                        if (allComponents[j] == paramType)
                         {
                             fieldIndex = j + 1; // 1-based
                             break;
                         }
                     }
-                    
+
                     if (fieldIndex != -1)
                     {
                         sb.Append(indent).AppendLine($"            var span_{paramName} = it.Field<{paramType}>({fieldIndex});");
                         paramToFieldMap[paramName] = fieldIndex;
                     }
                 }
-                
+
                 sb.AppendLine();
                 sb.Append(indent).AppendLine("            foreach (var i in it)");
                 sb.Append(indent).AppendLine("            {");
-                
+
                 // Construct call arguments
                 var callArgs = new List<string>();
                 for (int i = 0; i < query.ParameterTypeNames.Length; i++)
@@ -164,7 +164,7 @@ namespace UnifyECS.Generators.Backends
                     var paramType = query.ParameterTypeNames[i];
                     var paramName = query.ParameterNames[i];
                     var refKind = query.ParameterRefKinds[i];
-                    
+
                     if (IsEntityParameter(paramType))
                     {
                         // Map entity
@@ -178,13 +178,13 @@ namespace UnifyECS.Generators.Backends
                         // ref span[i]
                         string prefix = refKind == RefKind.Ref ? "ref " : (refKind == RefKind.In ? "in " : "");
                         if (refKind == RefKind.Out) prefix = "out "; // Should not happen for queries usually unless created
-                        
+
                         callArgs.Add($"{prefix}span_{paramName}[i]");
                     }
                 }
-                
+
                 sb.Append(indent).AppendLine($"                {query.MethodName}({string.Join(", ", callArgs)});");
-                
+
                 sb.Append(indent).AppendLine("            }");
                 sb.Append(indent).AppendLine("        });");
             }
@@ -202,7 +202,7 @@ namespace UnifyECS.Generators.Backends
 
         private bool IsEntityParameter(string typeName)
         {
-            return typeName == "UnifyECS.Entity" || 
+            return typeName == "UnifyECS.Entity" ||
                    typeName == "Entity" ||
                    typeName == "global::UnifyECS.Entity";
         }
@@ -294,10 +294,10 @@ namespace UnifyECS.Generators.Backends
 
         private static string ToAccessibilityString(Accessibility accessibility) => accessibility switch
         {
-            Accessibility.Public    => "public",
-            Accessibility.Internal  => "internal",
+            Accessibility.Public => "public",
+            Accessibility.Internal => "internal",
             Accessibility.Protected => "protected",
-            Accessibility.Private   => "private",
+            Accessibility.Private => "private",
             Accessibility.ProtectedOrInternal => "protected internal",
             Accessibility.ProtectedAndInternal => "private protected",
             _ => "internal"

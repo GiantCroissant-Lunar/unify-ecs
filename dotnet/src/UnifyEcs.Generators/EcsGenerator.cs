@@ -32,19 +32,19 @@ namespace UnifyECS.Generators
             public bool EmitFriflo => Array.IndexOf(Backends, EcsBackend.Friflo) >= 0;
         }
 
-        private const string ComponentAttributeMetadataName          = "UnifyECS.EcsComponentAttribute";
-        private const string SystemAttributeMetadataName             = "UnifyECS.EcsSystemAttribute";
-        private const string QueryAttributeMetadataName              = "UnifyECS.QueryAttribute";
-        private const string EcsRequiresAttributeMetadataName        = "UnifyECS.EcsRequiresAttribute";
-        private const string OnAddedAttributeMetadataName            = "UnifyECS.OnAddedAttribute";
-        private const string OnRemovedAttributeMetadataName          = "UnifyECS.OnRemovedAttribute";
-        private const string OnChangedAttributeMetadataName          = "UnifyECS.OnChangedAttribute";
-        private const string StructuralChangesAttributeMetadataName  = "UnifyECS.StructuralChangesAttribute";
+        private const string ComponentAttributeMetadataName = "UnifyECS.EcsComponentAttribute";
+        private const string SystemAttributeMetadataName = "UnifyECS.EcsSystemAttribute";
+        private const string QueryAttributeMetadataName = "UnifyECS.QueryAttribute";
+        private const string EcsRequiresAttributeMetadataName = "UnifyECS.EcsRequiresAttribute";
+        private const string OnAddedAttributeMetadataName = "UnifyECS.OnAddedAttribute";
+        private const string OnRemovedAttributeMetadataName = "UnifyECS.OnRemovedAttribute";
+        private const string OnChangedAttributeMetadataName = "UnifyECS.OnChangedAttribute";
+        private const string StructuralChangesAttributeMetadataName = "UnifyECS.StructuralChangesAttribute";
         private const string RequiresRandomAccessAttributeMetadataName = "UnifyECS.RequiresRandomAccessAttribute";
         private const string CommandBufferSystemAttributeMetadataName = "UnifyECS.CommandBufferSystemAttribute";
-        private const string EcsOptimizeAttributeMetadataName        = "UnifyECS.EcsOptimizeAttribute";
-        private const string InjectAttributeMetadataName             = "UnifyECS.InjectAttribute";
-        private const string ICommandBufferTypeMetadataName          = "UnifyECS.ICommandBuffer";
+        private const string EcsOptimizeAttributeMetadataName = "UnifyECS.EcsOptimizeAttribute";
+        private const string InjectAttributeMetadataName = "UnifyECS.InjectAttribute";
+        private const string ICommandBufferTypeMetadataName = "UnifyECS.ICommandBuffer";
 
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
@@ -306,9 +306,9 @@ namespace UnifyECS.Generators
             {
                 ITypeSymbol? memberType = member switch
                 {
-                    IFieldSymbol f    => f.Type,
+                    IFieldSymbol f => f.Type,
                     IPropertySymbol p => p.Type,
-                    _                 => null
+                    _ => null
                 };
 
                 if (memberType is not INamedTypeSymbol namedType)
@@ -626,7 +626,7 @@ namespace UnifyECS.Generators
         private static ulong ComputeStructureHash(INamedTypeSymbol type)
         {
             const ulong fnvOffset = 14695981039346656037UL;
-            const ulong fnvPrime  = 1099511628211UL;
+            const ulong fnvPrime = 1099511628211UL;
 
             ulong hash = fnvOffset;
 
@@ -905,9 +905,9 @@ namespace UnifyECS.Generators
             if (system.Requirements is null || system.Requirements.Length == 0)
                 return EcsFeature.None;
 
-            var native      = BackendCapabilities.GetNativeFeatures(backend);
-            var emulatable  = BackendCapabilities.GetEmulatableFeatures(backend);
-            var emulated    = EcsFeature.None;
+            var native = BackendCapabilities.GetNativeFeatures(backend);
+            var emulatable = BackendCapabilities.GetEmulatableFeatures(backend);
+            var emulated = EcsFeature.None;
 
             foreach (var requirement in system.Requirements)
             {

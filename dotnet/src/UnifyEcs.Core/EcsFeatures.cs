@@ -28,10 +28,10 @@ namespace UnifyECS
         None = 0,
 
         // Tier 1: Universal
-        EntityLifecycle      = 1 << 0,
-        ComponentOperations  = 1 << 1,
-        BasicQueries         = 1 << 2,
-        SystemExecution      = 1 << 3,
+        EntityLifecycle = 1 << 0,
+        ComponentOperations = 1 << 1,
+        BasicQueries = 1 << 2,
+        SystemExecution = 1 << 3,
 
         /// <summary>
         /// Combination of all Tier 1 features.
@@ -39,22 +39,22 @@ namespace UnifyECS
         Basic = EntityLifecycle | ComponentOperations | BasicQueries | SystemExecution,
 
         // Tier 2: Common
-        Events           = 1 << 4,
+        Events = 1 << 4,
         AdvancedFiltering = 1 << 5,
-        TagComponents    = 1 << 6,
-        SystemGroups     = 1 << 7,
+        TagComponents = 1 << 6,
+        SystemGroups = 1 << 7,
 
         // Tier 3: Advanced
-        Reactive         = 1 << 8,
-        Relationships    = 1 << 9,
-        Jobs             = 1 << 10,
-        WorldEvents      = 1 << 11,
+        Reactive = 1 << 8,
+        Relationships = 1 << 9,
+        Jobs = 1 << 10,
+        WorldEvents = 1 << 11,
 
         // Tier 4: Specialized
-        BurstCompile     = 1 << 12,
+        BurstCompile = 1 << 12,
         SharedComponents = 1 << 13,
-        ChunkIteration   = 1 << 14,
-        ComponentPools   = 1 << 15,
+        ChunkIteration = 1 << 14,
+        ComponentPools = 1 << 15,
     }
 
     public enum FeatureSupportLevel
