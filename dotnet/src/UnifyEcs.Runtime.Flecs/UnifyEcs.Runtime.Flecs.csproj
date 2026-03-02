@@ -3,6 +3,12 @@
     <TargetFramework>net9.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
+    <IsPackable>true</IsPackable>
+    <PackageId>UnifyEcs.Runtime.Flecs</PackageId>
+    <Version>$(GITVERSION_MAJORMINORPATCH)</Version>
+    <Authors>Lunar Horse</Authors>
+    <Description>Flecs ECS runtime implementation for the UnifyECS framework</Description>
+    <PackageTags>ecs;unify;lunar-horse;runtime;flecs</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>

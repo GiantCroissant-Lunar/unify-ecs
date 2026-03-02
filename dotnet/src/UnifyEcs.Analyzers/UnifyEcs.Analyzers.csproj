@@ -3,9 +3,15 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
-    <IsPackable>false</IsPackable>
-    <!-- Analyzer project -->
-    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <IsPackable>true</IsPackable>
+    <PackageId>UnifyEcs.Analyzers</PackageId>
+    <Version>$(GITVERSION_MAJORMINORPATCH)</Version>
+    <Authors>Lunar Horse</Authors>
+    <Description>Analyzers for the UnifyECS framework</Description>
+    <PackageTags>ecs;unify;lunar-horse;analyzer</PackageTags>
+    <IncludeBuildOutput>true</IncludeBuildOutput>
+    <DevelopmentDependency>true</DevelopmentDependency>
+    <NoPackageAnalysis>true</NoPackageAnalysis>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\UnifyEcs.Core\UnifyEcs.Core.csproj" />
-    <ProjectReference Include="..\UnifyEcs.Attributes\UnifyEcs.Attributes.csproj" />
+    <ProjectReference Include="..\UnifyEcs.Core\UnifyEcs.Core.csproj" PrivateAssets="all" />
+    <ProjectReference Include="..\UnifyEcs.Attributes\UnifyEcs.Attributes.csproj" PrivateAssets="all" />
   </ItemGroup>
 </Project>

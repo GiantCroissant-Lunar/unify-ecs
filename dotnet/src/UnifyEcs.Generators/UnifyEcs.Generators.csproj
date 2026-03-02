@@ -3,9 +3,15 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
-    <IsPackable>false</IsPackable>
-    <!-- This project is an analyzer / source generator -->
-    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <IsPackable>true</IsPackable>
+    <PackageId>UnifyEcs.Generators</PackageId>
+    <Version>$(GITVERSION_MAJORMINORPATCH)</Version>
+    <Authors>Lunar Horse</Authors>
+    <Description>Source generators for the UnifyECS framework</Description>
+    <PackageTags>ecs;unify;lunar-horse;source-generator;analyzer</PackageTags>
+    <IncludeBuildOutput>true</IncludeBuildOutput>
+    <DevelopmentDependency>true</DevelopmentDependency>
+    <NoPackageAnalysis>true</NoPackageAnalysis>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,8 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\UnifyEcs.Core\UnifyEcs.Core.csproj" />
-    <ProjectReference Include="..\UnifyEcs.Attributes\UnifyEcs.Attributes.csproj" />
+    <ProjectReference Include="..\UnifyEcs.Core\UnifyEcs.Core.csproj" PrivateAssets="all" />
+    <ProjectReference Include="..\UnifyEcs.Attributes\UnifyEcs.Attributes.csproj" PrivateAssets="all" />
   </ItemGroup>
 
   <!-- Expose optional property to toggle extra debug output if desired -->

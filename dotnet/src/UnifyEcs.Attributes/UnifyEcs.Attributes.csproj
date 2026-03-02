@@ -3,6 +3,12 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
+    <IsPackable>true</IsPackable>
+    <PackageId>UnifyEcs.Attributes</PackageId>
+    <Version>$(GITVERSION_MAJORMINORPATCH)</Version>
+    <Authors>Lunar Horse</Authors>
+    <Description>Attributes and markers for the UnifyECS framework</Description>
+    <PackageTags>ecs;unify;lunar-horse;attributes</PackageTags>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\UnifyEcs.Core\UnifyEcs.Core.csproj" />

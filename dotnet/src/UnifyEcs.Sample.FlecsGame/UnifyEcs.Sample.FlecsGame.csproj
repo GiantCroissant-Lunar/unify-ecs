@@ -4,6 +4,12 @@
     <TargetFramework>net9.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
+    <IsPackable>true</IsPackable>
+    <PackageId>UnifyEcs.Sample.FlecsGame</PackageId>
+    <Version>$(GITVERSION_MAJORMINORPATCH)</Version>
+    <Authors>Lunar Horse</Authors>
+    <Description>Sample Flecs ECS game for the UnifyECS framework</Description>
+    <PackageTags>ecs;unify;lunar-horse;sample;flecs;game</PackageTags>
   </PropertyGroup>
 
   <PropertyGroup>
