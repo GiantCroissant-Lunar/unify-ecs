@@ -190,8 +190,10 @@ namespace UnifyECS.Generators
 
             // Determine IsTag from attribute named arguments
             var isTag = false;
-            foreach (var (name, value) in attr.NamedArguments)
+            foreach (var pair in attr.NamedArguments)
             {
+                var name = pair.Key;
+                var value = pair.Value;
                 if (name == "IsTag" && value.Value is bool b)
                 {
                     isTag = b;
@@ -237,8 +239,10 @@ namespace UnifyECS.Generators
             var order = 0;
             string? groupFullName = null;
 
-            foreach (var (name, arg) in systemAttr.NamedArguments)
+            foreach (var pair in systemAttr.NamedArguments)
             {
+                var name = pair.Key;
+                var arg = pair.Value;
                 switch (name)
                 {
                     case "Phase" when arg.Value is int phaseValue:
@@ -288,8 +292,10 @@ namespace UnifyECS.Generators
                 if ((EcsBackend)backendValue != EcsBackend.Arch)
                     continue;
 
-                foreach (var (name, arg) in attr.NamedArguments)
+                foreach (var pair in attr.NamedArguments)
                 {
+                    var name = pair.Key;
+                    var arg = pair.Value;
                     if (name == "InlineQuery" && arg.Value is bool b && b)
                     {
                         archInlineQuery = true;
@@ -390,8 +396,10 @@ namespace UnifyECS.Generators
                 }
 
                 var behavior = MissingFeatureBehavior.Error;
-                foreach (var (name, arg) in attr.NamedArguments)
+                foreach (var pair in attr.NamedArguments)
                 {
+                    var name = pair.Key;
+                    var arg = pair.Value;
                     if (name == "IfMissing" && arg.Value is int behaviorValue)
                     {
                         behavior = (MissingFeatureBehavior)behaviorValue;
@@ -472,8 +480,10 @@ namespace UnifyECS.Generators
             string[] exclusive = Array.Empty<string>();
             var cached = true;
 
-            foreach (var (name, arg) in queryAttr.NamedArguments)
+            foreach (var pair in queryAttr.NamedArguments)
             {
+                var name = pair.Key;
+                var arg = pair.Value;
                 switch (name)
                 {
                     case "All":
@@ -536,8 +546,10 @@ namespace UnifyECS.Generators
             {
                 hasStructuralChanges = true;
 
-                foreach (var (name, arg) in structuralAttr.NamedArguments)
+                foreach (var pair in structuralAttr.NamedArguments)
                 {
+                    var name = pair.Key;
+                    var arg = pair.Value;
                     switch (name)
                     {
                         case "Mode" when arg.Value is int modeValue:

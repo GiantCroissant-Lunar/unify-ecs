@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <IsPackable>true</IsPackable>
@@ -9,8 +9,9 @@
     <Authors>Lunar Horse</Authors>
     <Description>Source generators for the UnifyECS framework</Description>
     <PackageTags>ecs;unify;lunar-horse;source-generator;analyzer</PackageTags>
-    <IncludeBuildOutput>true</IncludeBuildOutput>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
     <DevelopmentDependency>true</DevelopmentDependency>
+    <PackageType>Analyzer</PackageType>
     <NoPackageAnalysis>true</NoPackageAnalysis>
   </PropertyGroup>
 
@@ -18,15 +19,20 @@
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" PrivateAssets="all" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\UnifyEcs.Core\UnifyEcs.Core.csproj" PrivateAssets="all" />
-    <ProjectReference Include="..\UnifyEcs.Attributes\UnifyEcs.Attributes.csproj" PrivateAssets="all" />
-  </ItemGroup>
-
   <!-- Expose optional property to toggle extra debug output if desired -->
   <ItemGroup>
     <CompilerVisibleProperty Include="UnifyEcsEmitDebugInfo" />
     <CompilerVisibleProperty Include="UnifyEcsBackends" />
     <CompilerVisibleProperty Include="UnifyEcsMissingFeaturePolicy" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\UnifyEcs.Core\UnifyEcs.Core.csproj" PrivateAssets="all" />
+    <ProjectReference Include="..\UnifyEcs.Attributes\UnifyEcs.Attributes.csproj" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="_._" Pack="true" PackagePath="lib/netstandard2.0" Visible="false" />
+    <None Include="$(OutputPath)$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
   </ItemGroup>
 </Project>

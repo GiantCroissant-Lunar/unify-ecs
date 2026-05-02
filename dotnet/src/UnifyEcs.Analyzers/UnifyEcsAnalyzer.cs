@@ -363,8 +363,10 @@ namespace UnifyECS.Analyzers
 
                     if (deferredStructuralModeValue is int deferredValue)
                     {
-                        foreach (var (name, arg) in structuralAttr.NamedArguments)
+                        foreach (var pair in structuralAttr.NamedArguments)
                         {
+                            var name = pair.Key;
+                            var arg = pair.Value;
                             if (name != "Mode")
                                 continue;
 
@@ -426,8 +428,10 @@ namespace UnifyECS.Analyzers
                 {
                     if (structuralAttr is not null)
                     {
-                        foreach (var (name, arg) in structuralAttr.NamedArguments)
+                        foreach (var pair in structuralAttr.NamedArguments)
                         {
+                            var name = pair.Key;
+                            var arg = pair.Value;
                             if (name == "Mode" && arg.Value is int modeValue && modeValue == immediateValue)
                             {
                                 if (!IsSuppressed(systemType, Diagnostics.UECS012_ImmediateStructuralChangesInParallelSystem.Id))
@@ -613,8 +617,10 @@ namespace UnifyECS.Analyzers
                     continue;
 
                 var parallel = false;
-                foreach (var (name, arg) in attr.NamedArguments)
+                foreach (var pair in attr.NamedArguments)
                 {
+                    var name = pair.Key;
+                    var arg = pair.Value;
                     if (name == "Parallel" && arg.Value is bool b)
                     {
                         parallel = b;
@@ -633,8 +639,10 @@ namespace UnifyECS.Analyzers
             AttributeData attribute,
             string argumentName)
         {
-            foreach (var (name, value) in attribute.NamedArguments)
+            foreach (var pair in attribute.NamedArguments)
             {
+                var name = pair.Key;
+                var value = pair.Value;
                 if (name != argumentName)
                     continue;
 

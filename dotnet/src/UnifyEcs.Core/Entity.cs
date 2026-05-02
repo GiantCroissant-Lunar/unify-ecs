@@ -37,7 +37,13 @@ namespace UnifyECS
 
         public override bool Equals(object? obj) => obj is Entity other && Equals(other);
 
-        public override int GetHashCode() => HashCode.Combine(Id, Generation);
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return (Id * 397) ^ Generation;
+            }
+        }
 
         public static bool operator ==(Entity left, Entity right) => left.Equals(right);
 
