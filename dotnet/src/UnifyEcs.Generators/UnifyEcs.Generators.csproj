@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.3.0" PrivateAssets="all" />
   </ItemGroup>
 
   <!-- Expose optional property to toggle extra debug output if desired -->
@@ -24,11 +24,6 @@
     <CompilerVisibleProperty Include="UnifyEcsEmitDebugInfo" />
     <CompilerVisibleProperty Include="UnifyEcsBackends" />
     <CompilerVisibleProperty Include="UnifyEcsMissingFeaturePolicy" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\UnifyEcs.Core\UnifyEcs.Core.csproj" PrivateAssets="all" />
-    <ProjectReference Include="..\UnifyEcs.Attributes\UnifyEcs.Attributes.csproj" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>

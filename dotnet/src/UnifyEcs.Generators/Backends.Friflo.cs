@@ -3,7 +3,6 @@ using System.Linq;
 using System.Text;
 using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
-using UnifyECS;
 
 namespace UnifyECS.Generators.Backends
 {

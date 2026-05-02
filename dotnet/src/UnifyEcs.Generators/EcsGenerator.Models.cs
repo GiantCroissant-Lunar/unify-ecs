@@ -1,5 +1,4 @@
 using Microsoft.CodeAnalysis;
-using UnifyECS;
 
 namespace UnifyECS.Generators
 {

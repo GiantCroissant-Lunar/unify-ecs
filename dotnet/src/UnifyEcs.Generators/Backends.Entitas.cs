@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using UnifyECS;
 
 namespace UnifyECS.Generators.Backends
 {
