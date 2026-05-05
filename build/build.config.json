@@ -31,5 +31,6 @@
   "packProperties": {
     "GeneratePackageOnBuild": "false"
   },
-  "syncLocalNugetFeed": false
+  "syncLocalNugetFeed": true,
+  "localNugetFeedRoot": "C:\\lunar-horse\\packages\\nuget"
 }
