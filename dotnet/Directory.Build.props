@@ -1,4 +1,14 @@
 <Project>
+  <PropertyGroup>
+    <PlateSharedRoot Condition="'$(PlateSharedRoot)'==''">$(MSBuildThisFileDirectory)..\..\plate-shared\</PlateSharedRoot>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="$(PlateSharedRoot)dotnet\shared\IsExternalInit.cs"
+             Link="Polyfills\IsExternalInit.cs"
+             Visible="false" />
+  </ItemGroup>
+
   <ItemGroup>
     <CompilerVisibleProperty Include="UnifyEcsEmitDebugInfo" />
     <CompilerVisibleProperty Include="UnifyEcsBackends" />
