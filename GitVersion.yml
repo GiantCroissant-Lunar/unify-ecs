@@ -1,0 +1,11 @@
+workflow: GitHubFlow/v1
+mode: ContinuousDeployment
+strategies:
+- ConfiguredNextVersion
+- Mainline
+- TaggedCommit
+branches:
+  main:
+    regex: ^main$
+    increment: Patch
+    label: ''
