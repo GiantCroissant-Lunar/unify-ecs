@@ -5,13 +5,20 @@ namespace UnifyECS.Analyzers
 {
     internal static class Diagnostics
     {
+        // Tags applied to descriptors reported via RegisterCompilationEndAction.
+        // Required by Roslyn's RS1037 so the IDE knows to suppress these in the
+        // single-file incremental analyzer pass and re-run them at compilation
+        // end (when the full registeredComponents set is known).
+        private static readonly string[] CompilationEndTags = { WellKnownDiagnosticTags.CompilationEnd };
+
         public static readonly DiagnosticDescriptor UECS003_InvalidQueryParameter = new(
             id: "UECS003",
             title: "Invalid query parameter type",
             messageFormat: "Query method '{0}' parameter '{1}' type '{2}' is not a registered component",
             category: "UnifyECS.Query",
             defaultSeverity: DiagnosticSeverity.Error,
-            isEnabledByDefault: true);
+            isEnabledByDefault: true,
+            customTags: CompilationEndTags);
 
         public static readonly DiagnosticDescriptor UECS010_QueryParametersDoNotMatchAll = new(
             id: "UECS010",
@@ -19,7 +26,8 @@ namespace UnifyECS.Analyzers
             messageFormat: "Query method '{0}' parameters do not match All components",
             category: "UnifyECS.Query",
             defaultSeverity: DiagnosticSeverity.Error,
-            isEnabledByDefault: true);
+            isEnabledByDefault: true,
+            customTags: CompilationEndTags);
 
         public static readonly DiagnosticDescriptor UECS004_ComponentMustBeStruct = new(
             id: "UECS004",
@@ -83,7 +91,8 @@ namespace UnifyECS.Analyzers
             messageFormat: "Immediate structural changes in parallel system (DOTS)",
             category: "UnifyECS.StructuralChanges",
             defaultSeverity: DiagnosticSeverity.Error,
-            isEnabledByDefault: true);
+            isEnabledByDefault: true,
+            customTags: CompilationEndTags);
 
         public static readonly DiagnosticDescriptor UECS013_StructuralChangesMissingAttribute = new(
             id: "UECS013",
@@ -91,7 +100,8 @@ namespace UnifyECS.Analyzers
             messageFormat: "Method performs structural changes but missing [StructuralChanges]",
             category: "UnifyECS.StructuralChanges",
             defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: true);
+            isEnabledByDefault: true,
+            customTags: CompilationEndTags);
 
         public static readonly DiagnosticDescriptor UECS014_CrossEntityWriteWithoutDeferredMode = new(
             id: "UECS014",
@@ -99,7 +109,8 @@ namespace UnifyECS.Analyzers
             messageFormat: "Cross-entity write without deferred mode",
             category: "UnifyECS.StructuralChanges",
             defaultSeverity: DiagnosticSeverity.Error,
-            isEnabledByDefault: true);
+            isEnabledByDefault: true,
+            customTags: CompilationEndTags);
 
         public static readonly DiagnosticDescriptor UECS015_ICommandBufferNotInjected = new(
             id: "UECS015",
@@ -115,7 +126,8 @@ namespace UnifyECS.Analyzers
             messageFormat: "Query method '{0}' must return void",
             category: "UnifyECS.Query",
             defaultSeverity: DiagnosticSeverity.Error,
-            isEnabledByDefault: true);
+            isEnabledByDefault: true,
+            customTags: CompilationEndTags);
 
         public static readonly DiagnosticDescriptor UECS017_QueryCannotBeAsync = new(
             id: "UECS017",
@@ -123,7 +135,8 @@ namespace UnifyECS.Analyzers
             messageFormat: "Query method '{0}' cannot be async",
             category: "UnifyECS.Query",
             defaultSeverity: DiagnosticSeverity.Error,
-            isEnabledByDefault: true);
+            isEnabledByDefault: true,
+            customTags: CompilationEndTags);
 
         public static readonly DiagnosticDescriptor UECS018_SystemCannotBeNested = new(
             id: "UECS018",
@@ -139,7 +152,8 @@ namespace UnifyECS.Analyzers
             messageFormat: "Deferred structural query method '{0}' mixes IWorld and ICommandBuffer structural calls",
             category: "UnifyECS.StructuralChanges",
             defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: true);
+            isEnabledByDefault: true,
+            customTags: CompilationEndTags);
 
         public static readonly DiagnosticDescriptor UECS101_ComponentHasReferenceFieldRequiresManaged = new(
             id: "UECS101",

@@ -188,9 +188,27 @@ namespace UnifyECS.Analyzers
             var immediateStructuralModeValue = GetEnumConstant(structuralModeType, "Immediate");
             var deferredStructuralModeValue = GetEnumConstant(structuralModeType, "Deferred");
 
-            var registeredComponents = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
+            // Two-phase analysis to avoid a race between component collection and system validation:
+            //
+            //   Phase 1 (RegisterSymbolAction):  populate registeredComponents from every
+            //                                    [EcsComponent] symbol in the compilation.
+            //   Phase 2 (RegisterCompilationEndAction): walk all [EcsSystem] types and validate
+            //                                           their [Query] parameters against the now-
+            //                                           complete registeredComponents set.
+            //
+            // The previous implementation registered both phases as parallel SymbolAction
+            // callbacks. Roslyn does not guarantee an ordering between independent
+            // SymbolAction registrations, so a query-parameter check could fire before the
+            // matching component had been added to the set, producing a spurious UECS003.
+            // Reproducible on a fresh build of fantasim-app-godot's App.Ecs project.
+            //
+            // Using a CompilationEndAction for Phase 2 forces it to run after every Phase 1
+            // SymbolAction has completed, eliminating the race.
 
-            // Collect all [EcsComponent] types
+            var registeredComponents = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
+            var systemSymbols = new List<INamedTypeSymbol>();
+
+            // Phase 1a: collect [EcsComponent] types
             context.RegisterSymbolAction(ctx =>
             {
                 if (ctx.Symbol is not INamedTypeSymbol type)
@@ -198,27 +216,51 @@ namespace UnifyECS.Analyzers
 
                 if (HasAttribute(type, ComponentAttributeMetadataName))
                 {
-                    registeredComponents.Add(type);
+                    lock (registeredComponents)
+                    {
+                        registeredComponents.Add(type);
+                    }
                 }
             }, SymbolKind.NamedType);
 
-            // Validate query parameters and structural rules on [EcsSystem] types
+            // Phase 1b: collect [EcsSystem] types for later validation
             context.RegisterSymbolAction(ctx =>
             {
                 if (ctx.Symbol is not INamedTypeSymbol systemType)
                     return;
 
-                AnalyzeSystemQueriesAndStructural(
-                    ctx,
-                    systemType,
-                    entityType,
-                    registeredComponents,
-                    dotsBackendValue,
-                    immediateStructuralModeValue,
-                    deferredStructuralModeValue,
-                    iWorldType,
-                    iCommandBufferType);
+                if (HasAttribute(systemType, SystemAttributeMetadataName))
+                {
+                    lock (systemSymbols)
+                    {
+                        systemSymbols.Add(systemType);
+                    }
+                }
             }, SymbolKind.NamedType);
+
+            // Phase 2: validate each [EcsSystem] AFTER all components have been collected.
+            context.RegisterCompilationEndAction(endCtx =>
+            {
+                List<INamedTypeSymbol> systems;
+                lock (systemSymbols)
+                {
+                    systems = new List<INamedTypeSymbol>(systemSymbols);
+                }
+
+                foreach (var systemType in systems)
+                {
+                    AnalyzeSystemQueriesAndStructural(
+                        endCtx,
+                        systemType,
+                        entityType,
+                        registeredComponents,
+                        dotsBackendValue,
+                        immediateStructuralModeValue,
+                        deferredStructuralModeValue,
+                        iWorldType,
+                        iCommandBufferType);
+                }
+            });
         }
 
         private static int? GetEnumConstant(INamedTypeSymbol? enumType, string memberName)
@@ -234,7 +276,7 @@ namespace UnifyECS.Analyzers
         }
 
         private static void AnalyzeSystemQueriesAndStructural(
-            SymbolAnalysisContext context,
+            CompilationAnalysisContext context,
             INamedTypeSymbol systemType,
             INamedTypeSymbol? entityType,
             HashSet<INamedTypeSymbol> registeredComponents,
