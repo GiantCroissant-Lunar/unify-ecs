@@ -1,6 +1,11 @@
 [Bb][Ii][Nn]/
 [Oo][Bb][Jj]/
 
+# NUKE / build temp + versioned output
+.nuke/
+.tmp/
+build/_artifacts/
+
 # Generated agent adapter outputs (regenerate via tools/sync-agent-resources.py)
 .agents/
 .claude/
