@@ -1,0 +1,39 @@
+version: '3'
+
+vars:
+  BUILD_DIR: build
+  ARTIFACTS_DIR: '{{.BUILD_DIR}}/_artifacts'
+
+tasks:
+  default:
+    cmds:
+      - task --list
+
+  restore:
+    desc: Restore dotnet tools
+    cmds:
+      - dotnet tool restore
+
+  build:
+    desc: Build the solution
+    deps: [restore]
+    cmds:
+      - dotnet unify-build compile
+
+  pack:
+    desc: Create NuGet packages
+    deps: [restore]
+    cmds:
+      - dotnet unify-build pack
+
+  test:
+    desc: Run all tests
+    deps: [restore]
+    cmds:
+      - dotnet unify-build test
+
+  clean:
+    desc: Clean build artifacts
+    cmds:
+      - dotnet unify-build clean
+      - rm -rf {{.ARTIFACTS_DIR}} 2>/dev/null || true
